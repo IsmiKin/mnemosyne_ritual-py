@@ -1,0 +1,2 @@
+REVIEWS = "reviews"
+SCORES = "scores"

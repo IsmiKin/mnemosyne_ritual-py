@@ -1,0 +1,2 @@
+SEPARATOR = ","
+ENCODING = "utf-8"

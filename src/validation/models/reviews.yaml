@@ -1,0 +1,29 @@
+fields:
+  - name: rating
+    type: integer
+  - name: sitter_image
+    type: string
+  - name: end_date
+    type: date
+  - name: text
+    type: string
+  - name: owner_image
+    type: string
+  - name: dogs
+    type: string
+  - name: sitter
+    type: string
+  - name: owner
+    type: string
+  - name: start_date
+    type: date
+  - name: sitter_phone_number
+    type: integer
+  - name: sitter_email
+    type: string
+  - name: owner_phone_number
+    type: integer
+  - name: owner_email
+    type: string
+  - name: response_time_minutes
+    type: integer

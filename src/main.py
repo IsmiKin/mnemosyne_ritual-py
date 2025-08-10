@@ -1,12 +1,13 @@
 import typer
 from pprint import pprint
 from statistics import fmean
-from frictionless import Schema, describe, validate
 
 from string import ascii_letters
 
 import utils.logger as logger_factory
-import utils.input_files as files_utils
+
+import extract.extract as extract_logic
+import validation.validation as validation_logic
 
 log = logger_factory.get_logger()
 
@@ -50,27 +51,31 @@ def search_calculation(row):
 def process_file(file_name: str):
     log.info(f"Processing file: {file_name}")
 
-    # TODO: Move to constant
-    model_path = "models/reviews.json"
-    files_utils.file_exists(model_path)
-    schema = Schema.from_descriptor(model_path)
-    file_resource = describe(file_name, format="csv", schema=schema)
-    report = validate(file_resource)
-
-    if not report.valid:
-        log.error("Validation failed")
-        log.error(report.to_summary())
+    if not extract_logic.file_exists(file_name):
+        log.error("File does not exist")
         raise typer.Exit(code=1)
 
-    df = files_utils.csv_to_dataframe(file_name)
+    # Validate input file
+    is_valid, report = validation_logic.validate_reviews_file(file_name)
+    if not is_valid:
+        log.error("Validation failed for file: {}".format(file_name))
+        log.error(report)
+        raise typer.Exit(code=1)
+
+    # Extract data
+    dataframe = extract_logic.csv_to_dataframe(file_name)
 
     # TODO: Move to sanitizing utils
-    df["profile_score"] = df.apply(profile_calculation, axis=1)
-    df["ratings_score"] = df.groupby("sitter")["rating"].transform("mean").round(2)
-    df["num_stays"] = df.groupby("sitter")["rating"].transform("count")
-    df["search_score"] = df.apply(search_calculation, axis=1).round(2)
-    df.drop_duplicates(subset=["sitter"], keep="first", inplace=True)
-    df_sorted = df.sort_values(by=["search_score", "sitter"], ascending=[False, True])
+    dataframe["profile_score"] = dataframe.apply(profile_calculation, axis=1)
+    dataframe["ratings_score"] = (
+        dataframe.groupby("sitter")["rating"].transform("mean").round(2)
+    )
+    dataframe["num_stays"] = dataframe.groupby("sitter")["rating"].transform("count")
+    dataframe["search_score"] = dataframe.apply(search_calculation, axis=1).round(2)
+    dataframe.drop_duplicates(subset=["sitter"], keep="first", inplace=True)
+    df_sorted = dataframe.sort_values(
+        by=["search_score", "sitter"], ascending=[False, True]
+    )
 
     pprint(
         df_sorted[
