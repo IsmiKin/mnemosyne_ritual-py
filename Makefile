@@ -12,10 +12,12 @@ install:
 build:
 	docker-compose build
 
+clean-docker-run:
+	docker rm $(docker ps -aq -f status=exited)
+
 clean-build:
 	docker rm $(docker ps -aq -f status=exited)
 	docker rmi mnemosyne*
-
 
 up-dev: build
 	docker-compose down
