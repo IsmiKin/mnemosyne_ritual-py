@@ -1,0 +1,63 @@
+# downgrade to v2 because it does not support anymore condition
+# on 'depends_on'
+version: '2.1'
+
+services:
+
+  # db:
+  #   image: postgres
+  #   restart: always
+  #   # volumes:
+  #     # uncomment to maintan persistance
+  #       #- ./postgresql/:/var/lib/postgresql/data/
+  #     # uncomment to use init scripts on sql_scripts folder
+  #     # - ./sql_scripts:/docker-entrypoint-initdb.d/
+  #   environment:
+  #     POSTGRES_PASSWORD: password_example
+  #     POSTGRES_USER: user_example
+  #     POSTGRES_DB: matchers
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   # uncomment for development (access from host)
+  #   ports:
+  #     - 5432:5432
+
+
+  ## web ui for Postgres (alternative: DBeaver installed on OS)
+  # adminer:
+  #   image: adminer
+  #   restart: always
+  #   ports:
+  #     - 8080:8080
+
+
+
+  # ## Postgres db migrations with Alembic
+  # migration:
+  #   build: .
+  #   image: matcher:staging
+  #   command: alembic upgrade head
+  #   # command: tail -F /dev/null
+  #   environment:
+  #     DB_URL: postgresql://user_example:password_example@db:5432/matchers
+  #   links:
+  #     - db
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+
+
+  ## Logic to score the input and store and for testing using CLI
+  mnemosyne:
+    image: mnemosyne
+    build: .
+    command: tail -F /dev/null
+    # links:
+    #   - db
+    environment:
+      DB_URL: postgresql://user_example:password_example@db:5432/matchers
+    # depends_on:
+    #   - migration
