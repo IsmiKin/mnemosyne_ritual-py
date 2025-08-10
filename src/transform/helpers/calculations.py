@@ -17,6 +17,15 @@ def profile_calculation(row: pd.Series) -> int:
 
 
 def search_calculation(row: pd.Series) -> float:
+    """Calculate the search score based on the ratings score and profile score.
+
+    The weight of the profile score is increased for sitters with fewer stays,
+    while the weight of the ratings score is increased for sitters with more stays.
+
+    Args:
+        row (pd.Series): A row of the DataFrame containing the necessary fields.
+    Returns:
+        float: The calculated search score."""
     num_stays = row[SCORE_FIELDS["num_stays"]]
     profile_score = row[SCORE_FIELDS["profile_score"]]
     ratings_score = row[SCORE_FIELDS["ratings_score"]]

@@ -15,7 +15,6 @@ def enrich_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The enriched DataFrame with new columns.
     """
-    # Calculate profile score
     df[SCORE_FIELDS["profile_score"]] = df.apply(profile_calculation, axis=1)
     df[SCORE_FIELDS["ratings_score"]] = (
         df.groupby(REVIEWS_FILES_FIELDS["sitter"])[REVIEWS_FILES_FIELDS["rating"]]
@@ -33,6 +32,12 @@ def enrich_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def sort_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    """Sorts the DataFrame based on the search score and sitter name.
+    Args:
+        df (pd.DataFrame): The DataFrame to sort.
+    Returns:
+        pd.DataFrame: The sorted DataFrame.
+    """
     df.drop_duplicates(
         subset=[REVIEWS_FILES_FIELDS["sitter"]], keep="first", inplace=True
     )
