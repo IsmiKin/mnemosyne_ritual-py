@@ -1,11 +1,14 @@
 import typer
+from typing_extensions import Annotated
 
 import utils.logger as logger_factory
 
+import constants.process_phases as PROCESS_PHASES
 import extract.extract as extract_logic
 import validation.validation as validation_logic
 import transform.transform as transform_logic
-import persist.persist as persist_logic
+import persist.persist_disk as persist_disk_logic
+import persist.persist_db as persist_db_logic
 
 log = logger_factory.get_logger()
 
@@ -14,8 +17,18 @@ app = typer.Typer()
 
 
 @app.command()
-def process_file(file_name: str):
-    """ "
+def hello(name: str = typer.Argument("World")) -> None:
+    """Say hello to NAME."""
+    log.info(f"Hello {name}!")
+    typer.echo(f"Hello {name}!")
+
+
+@app.command()
+def process_file(
+    file_name: str,
+    db_persist: Annotated[bool, typer.Option(help="Persist to database.")] = False,
+) -> None:
+    """
     Process the file stored in the file_name path.
 
     It will validate the file, extract the data, and calculate scores.
@@ -27,6 +40,7 @@ def process_file(file_name: str):
     Returns:
         None
     """
+    phases_completed = []
     log.info(f"Processing file: {file_name}")
 
     # Extract data
@@ -35,6 +49,7 @@ def process_file(file_name: str):
         raise typer.Exit(code=1)
 
     log.info(f"Extract file: {file_name} successfully")
+    phases_completed.append(PROCESS_PHASES.EXTRACT)
 
     # Validate input file
     is_valid, report = validation_logic.validate_reviews_file(file_name)
@@ -44,19 +59,39 @@ def process_file(file_name: str):
         raise typer.Exit(code=1)
 
     log.info(f"Validation file: {file_name} successfully")
+    phases_completed.append(PROCESS_PHASES.VALIDATE)
 
     # Transform data
-    dataframe = extract_logic.csv_to_dataframe(file_name)
-    enrich_df = transform_logic.enrich_dataframe(dataframe)
-    sorted_df = transform_logic.sort_dataframe(enrich_df)
-
-    log.info(f"Transform and sorting file: {file_name} successfully")
+    try:
+        dataframe = extract_logic.csv_to_dataframe(file_name)
+        enrich_df = transform_logic.enrich_dataframe(dataframe)
+        sorted_df = transform_logic.sort_dataframe(enrich_df)
+        log.info(f"Transform and sorting file: {file_name} successfully")
+        phases_completed.append(PROCESS_PHASES.TRANSFORM)
+    except Exception as e:
+        log.error(f"Error transforming data: {e}")
 
     # Persist data
-    persist_logic.persist_dataframe_csv(sorted_df, file_name)
-    log.info(
-        "File processed successfully. Output saved to {}-output.csv".format(file_name)
-    )
+    try:
+        persist_disk_logic.persist_dataframe_csv(sorted_df, file_name)
+        phases_completed.append(PROCESS_PHASES.PERSIST)
+        log.info(
+            "File processed successfully. Output saved to {}-output.csv".format(
+                file_name
+            )
+        )
+    except Exception as e:
+        log.error(f"Error persisting data: {e}")
+
+    if db_persist:
+        log.info("Persisting data to database")
+
+        pipeline = persist_db_logic.create_sitter_scores_pipeline(
+            file_name, phases_completed
+        )
+
+        persist_db_logic.persist_dataframe_db(sorted_df, pipeline.uuid.hex)
+        log.info("Data persisted to database successfully")
 
 
 if __name__ == "__main__":

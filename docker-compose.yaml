@@ -54,9 +54,9 @@ services:
     image: mnemosyne
     build: .
     command: tail -F /dev/null
-    # links:
-    #   - db
+    links:
+      - db
     environment:
       DB_URL: postgresql://user_example:password_example@db:5432/mnemosyne
-    # depends_on:
-    #   - migration
+    depends_on:
+      - migration

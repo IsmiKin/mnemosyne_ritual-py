@@ -14,6 +14,7 @@ psycopg2-binary = "*"
 [dev-packages]
 black = "*"
 flake8 = "*"
+sqlacodegen = "*"
 
 [requires]
 python_version = "3.13"
