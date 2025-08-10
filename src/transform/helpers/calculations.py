@@ -8,12 +8,21 @@ import transform.constants.config as config
 
 
 def profile_calculation(row: pd.Series) -> int:
+    """Calculate the profile score based on the number of unique letters in the sitter's name.
+    The score is calculated by counting the unique letters in the sitter's name and multiplying
+    by a predefined modifier.
+    Args:
+        row (pd.Series): A row of the DataFrame containing the sitter's name.
+    Returns:
+        int: The calculated profile score.
+    """
+
     letters_set = set(ascii_letters)
-    unique_letters = set(row[REVIEWS_FILES_FIELDS["sitter"]].lower())
-    result = list(filter(lambda char: char in letters_set, unique_letters))
+    sitter_name = set(row[REVIEWS_FILES_FIELDS["sitter"]].lower())
+    unique_letters = sitter_name.intersection(letters_set)
 
     # NOTE: Question: Why 5? I think without the five it would be better
-    return len(result) * config.PROFILE_SCORE_MODIFIER
+    return len(unique_letters) * config.PROFILE_SCORE_MODIFIER
 
 
 def search_calculation(row: pd.Series) -> float:
@@ -26,6 +35,7 @@ def search_calculation(row: pd.Series) -> float:
         row (pd.Series): A row of the DataFrame containing the necessary fields.
     Returns:
         float: The calculated search score."""
+
     num_stays = row[SCORE_FIELDS["num_stays"]]
     profile_score = row[SCORE_FIELDS["profile_score"]]
     ratings_score = row[SCORE_FIELDS["ratings_score"]]
