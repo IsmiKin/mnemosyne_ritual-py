@@ -73,6 +73,7 @@ def process_file(
 
     # Persist data
     try:
+        ## TODO: Add validation for output file
         persist_disk_logic.persist_dataframe_csv(sorted_df, file_name)
         phases_completed.append(PROCESS_PHASES.PERSIST)
         log.info(

@@ -9,6 +9,8 @@ def persist_dataframe_csv(df: pd.DataFrame, file_name: str) -> None:
     Args:
         df (pd.DataFrame): The DataFrame to persist.
         file_name (str): The name of the file to save the DataFrame to.
+    Returns:
+        None
     """
     file_name_output = "{}-output.csv".format(file_name)
     truncated_df = df[REQUIRED_FIELDS]

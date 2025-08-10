@@ -8,7 +8,14 @@ from .models import SitterScoresPipelines, session
 def create_sitter_scores_pipeline(
     filename: str, phases_completed: list[str]
 ) -> SitterScoresPipelines:
-    """Create a new SitterScoresPipelines entry."""
+    """Create a new pipeline entry in the database.
+
+    Args:
+        filename (str): The name of the file being processed.
+        phases_completed (list[str]): List of phases completed during processing.
+    Returns:
+        SitterScoresPipelines: The created pipeline entry.
+    """
     new_pipeline = SitterScoresPipelines(
         filename=filename,
         file_time_update=datetime.now(),
@@ -20,7 +27,14 @@ def create_sitter_scores_pipeline(
 
 
 def persist_dataframe_db(dataframe: pd.DataFrame, pipeline_uuid: str) -> None:
-    """Persist the DataFrame to the database."""
+    """Persist the Sitters Scores DataFrame to the database.
+
+    Args:
+        dataframe (pd.DataFrame): The DataFrame to persist.
+        pipeline_uuid (str): The UUID of the pipeline to link the data to.
+    Returns:
+        None
+    """
     table_fields = [
         "sitter",
         "profile_score",
