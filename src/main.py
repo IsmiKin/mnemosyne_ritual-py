@@ -17,10 +17,10 @@ app = typer.Typer()
 
 
 @app.command()
-def hello(name: str = typer.Argument("World")) -> None:
-    """Say hello to NAME."""
-    log.info(f"Hello {name}!")
-    typer.echo(f"Hello {name}!")
+def version() -> str:
+    """Return the version."""
+    log.info(f"Version 0.1 !")
+    typer.echo(f"Version 0.1 !")
 
 
 @app.command()
