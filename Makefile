@@ -3,7 +3,7 @@ PYTHONPATH=$(CURDIR)
 .PHONY: all
 
 test:
-	coverage run --source=matcher/,matcher/score,matcher/data --omit=*/test* -m pytest --strict
+	coverage run --source=src/,src/extract,src/persist,src/transform,src/utils,src/validation --omit=*/test* -m pytest --strict
 	coverage report -m
 
 install:

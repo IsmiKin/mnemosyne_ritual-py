@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 
 mock_data/
-
+output/
 # C extensions
 *.so
 
