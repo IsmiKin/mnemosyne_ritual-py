@@ -44,6 +44,7 @@ def upgrade():
             default=uuid.uuid4,
         ),
         sa.Column("sitter", sa.Text(), nullable=False),
+        sa.Column("sitter_email", sa.Text(), nullable=False),
         sa.Column("profile_score", sa.Integer(), nullable=False),
         sa.Column("ratings_score", sa.Float(), nullable=True),
         sa.Column("search_score", sa.Float(), nullable=True),

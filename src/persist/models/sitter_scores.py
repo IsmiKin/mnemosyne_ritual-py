@@ -31,6 +31,7 @@ class SitterScores(Base):
         UUID, primary_key=True, default=uuid4, server_default=text("gen_random_uuid()")
     )
     sitter: Mapped[str] = mapped_column(Text)
+    sitter_email: Mapped[str] = mapped_column(Text)
     profile_score: Mapped[int] = mapped_column(Integer)
     ratings_score: Mapped[Optional[float]] = mapped_column(Double(53))
     search_score: Mapped[Optional[float]] = mapped_column(Double(53))

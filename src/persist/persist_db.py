@@ -3,6 +3,7 @@ from datetime import datetime
 import uuid
 
 from .models import SitterScoresPipelines, session
+from persist.constants.scores import REQUIRED_FIELDS
 
 
 def create_sitter_scores_pipeline(
@@ -35,13 +36,8 @@ def persist_dataframe_db(dataframe: pd.DataFrame, pipeline_uuid: str) -> None:
     Returns:
         None
     """
-    table_fields = [
-        "sitter",
-        "profile_score",
-        "ratings_score",
-        "search_score",
-    ]
-    cropped_df = pd.DataFrame(dataframe, columns=table_fields)
+
+    cropped_df = pd.DataFrame(dataframe, columns=REQUIRED_FIELDS)
     cropped_df["last_update_pipeline_FK"] = pipeline_uuid
     cropped_df["uuid"] = cropped_df.apply(lambda _: uuid.uuid4(), axis=1)
     cropped_df.to_sql(
